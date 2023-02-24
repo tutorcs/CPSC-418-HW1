@@ -1,0 +1,415 @@
+\documentclass{article}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{upquote}
+\usepackage{amssymb}
+\usepackage{wasysym}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{epsfig}
+\setlength{\oddsidemargin}{0in}\setlength{\textwidth}{6.5in}
+\setlength{\topmargin}{0.0in}\setlength{\textheight}{8.5in}
+\input{cs418-macros}
+\newcommand{\sq}{\textquotesingle}
+\newcommand{\bsq}[1]{\textquotesingle#1\textquotesingle}
+\newcommand{\erltemplate}{\hrefc{http://www.ugrad.cs.ubc.ca/~cs521/2022-1/hw/1/src/hw1.erl}{\code{hw1.erl}}}
+\newcommand{\testtemplate}{\hrefc{http://www.ugrad.cs.ubc.ca/~cs521/2022-1/hw/1/src/hw1_tests.erl}{\code{hw1\_tests.erl}}}
+\begin{document}
+\noindent%
+CpSc 521 \hfill \begin{tabular}[t]{c}{\Large\bf Homework 1}\smallskip\\
+  				     Getting started with Erlang
+		\end{tabular}
+	 \hfill \begin{tabular}[t]{l}Due: January 24, 2023, 11:59pm\\
+	                             Early-Bird: January 22, 2023, 11:59pm
+		\end{tabular}\bigskip\\
+\par\noindent%
+\section*{Prelude}
+Please submit your solution using:\\
+  \rule{2em}{0ex}\texttt{handin cs-418 hw1}
+Your solution should contain two files:
+\begin{description}
+  \item{\texttt{hw1.erl}}: Erlang source code for your solutions to the questions.
+  \item{\texttt{hw1.pdf}}: Your solutions to written questions.
+\end{description}
+  
+Templates for \erltemplate{} and \testtemplate{} are be available at\\
+\rule{1.5em}{0ex}\urlc{http://www.students.cs.ubc.ca/~cs-448/2022-2/hw/1/code.html}.\smallskip\\
+The tests in \testtemplate{} are not exhaustive.
+If your code doesn't work with these,
+it will almost certainly have problems with the test cases used for grading.
+The actual grading will include other test cases as well.
+
+Please submit code that compiles without errors or warnings.
+If your code does not compile, we might give you zero points on all of the
+programming problems.
+If we fix your code to make it compile, we will take off lots of points for that service.
+If your code generates compiler warnings, we will take off points for that as well, but
+not as many as for code that doesn't compile successfully.
+Any question about whether or not your code compiled as submitted will be determined by trying
+it on CS department linux machines.
+\par
+We will take off points for code that prints results unless we specifically asked for print-out.
+For this assignment, the functions you write should return the specified values, but they should
+not print anything to \code{stdout}.
+Using \iodoc{format}{2} when debugging is great, but you need to delete or comment-out such
+calls before submitting your solution.
+Printing an error message to \code{stdout} when your function is called with invalid arguments
+is acceptable but not required.  Your code must fail with some kind of error when called with
+invalid arguments.
+\par
+This assignment is based on the first thirteen sections of \lyse{} -- up through\\
+\hrefc{https://learnyousomeerlang.com/more-on-multiprocessing}{More on Multiprocessing}.
+
+\section*{The Questions (88 points)}
+
+\begin{enumerate}
+  \item Maps, Folds, and List Comprehensions (20 points)\label{q:mapfold}
+    \begin{enumerate}
+      \item \code{sum} (8 points)\\
+	Consider the function
+	\begin{xcode}
+	  sum(0) -> 0;\\
+	  sum(N) when is\_integer(N), 0 < N ->\\
+	  \>N + sum(N-1).
+	\end{xcode}
+	\begin{enumerate}
+	  \item Heads or tails (2 points):
+	    Is \code{sum} head-recursive or tail-recursive?\\
+	    Revise the body of the function \code{sum\_i} in the \texttt{hw1.erl} code template to
+	    return the atom \code{head\_recursive} if \code{sum} is head-recursive, and \code{tail\_recursive} otherwise.
+	  \item (3 points)
+	    Write the other version -- i.e. if \code{sum} is head-recursive, write \code{sum\_tr(N)} that is
+	    tail recursive; likewise, if \code{sum} is tail-recursive, write \code{sum\_hr(N)} that is head recursive.
+	    Of course, for any \code{N} (including invalid arguments), you should have
+	    \code{sum\_tr(N) =:= sum(N)}, or \code{sum\_hr(N) =:= sum(N)} (depending on which one you need to write).
+	    You may need to write a helper function in addition to writing \code{sum\_hr} or \code{sum\_tr}.
+	  \item (3 points)
+	    Write another version, \code{sum\_iii} using \listdoc{foldl}{3}, \listdoc{foldr}{3}, or \listdoc{map}{2}.
+	    You can also use \listdoc{seq}{2}.
+	\end{enumerate}
+      \item \code{sq} (8 points)\\
+	Consider the function
+	\begin{xcode}
+	  sq([]) -> [];\\
+	  sq([Hd | Tl) -> [Hd * Hd | sq(Tl)].
+	\end{xcode}
+	\begin{enumerate}
+	  \item Heads or tails (2 points):
+	    Is \code{sq} head recursive or tail recursive?\\
+	    Anwer ``head recursive'' or ``tail recursive'' and give a one sentence justification for your answer.
+	  \item (3 points)
+	    Write another version using, \code{sq\_ii} using \listdoc{foldl}{3}, \listdoc{foldr}{3}, or \listdoc{map}{2}.
+	  \item (3 points)
+	    Write another version using, \code{sq\_iii} using a list comprehension.
+	\end{enumerate}
+      \item Mind reading (4 points)
+	\begin{enumerate}
+	  \item (2 points) Why didn't I ask you to implement a version of \code{sum} using a list comprehension?
+	  \item (2 points) Why didn't I ask you to implement the other kind of recursion for \code{sq}?\\
+	    I.e. why not write \code{sq\_tr} if \code{sq} is head recursive, or \code{sq\_hr} if \code{sq} is tail recursive?
+	\end{enumerate}
+	Note: this really isn't a mind-reading exercise.  Any reasonable answer will be accepted, even if it's
+	not the one I was thinking of when I wrote the question.  You just need to show that you're thinking about
+	why you use particular Erlang constructs or not.
+    \end{enumerate}
+
+  \item \textbf{GCD} (10 points):\label{q:gcd}\\
+    Write a function, \code{gcd(A, B)} that returns the greatest common divisor
+    of \code{A} and \code{B}.  Your function should give the correct answer for any integers for
+    \code{A} and \code{B} as long as they aren't both \code{0},
+    and fail if either \code{A} or \code{B} is not an integer, or if both \code{A} and \code{B} are \code{0}.
+
+  \item \textbf{What is $\pi$?} (28 points)\\
+    Pick two integers, \code{A} and \code{B}, uniformly at random
+    with $1 \leq \code{A}, \code{B} \leq N$.  What is the probability that code{A} and \code{B}
+    are co-prime (i.e.\ that \code{gcd(A, B) == 1})?
+    In the limit that $N \rightarrow \infty$, this probability converges to $6/\pi^2$.
+    \begin{enumerate}
+      \item (8 points) Write a function, \code{p(N)} whose guard requires \code{N} to be a positive integer
+	(i.e.\ \code{N > 0}) and returns the number of distinct pairs of integers, \code{\tuple{A, B}}
+	with $1 \leq \code{A}, \code{B} \leq N$ such that \code{A} and \code{B} are co-prime.
+	For example, \code{p(6) -> 23}.
+      \item (4 points) Write a function, \code{pi(N)} that estimates the value of $\pi$ based on the
+	value returned from \code{p(N)}.
+      \item (10 points) To get a good estimate, we need a large value of \code{N}, and the run-time for
+	\code{p(N)} grows quadratically with \code{N} (or you probably did something wrong).
+	Now write \code{p(N, M)} that generates \code{M} samples of the form \code{\tuple{A, B}}
+	with \code{A} and \code{B} integers that are uniformly and independently distributed
+	with $1 \leq \code{A}, \code{B} \leq N$ and returns the number that it generated
+	with \code{A} and \code{B} co-prime.
+      \item (2 points) Write a function, \code{pi(N, M)} that estimates the value of $\pi$ based on the
+	value returned from \code{p(N, M)}.
+      \item (4 points) Try some tests of both \code{pi(N)} and \code{pi(N,M)}.
+	Make a few observations about the quality of the estimates and the execution times.
+	Nothing profound is required here.
+	Just make it clear that you ran your code and thought a little about the results.
+    \end{enumerate}
+
+  \item \textbf{Generators} (30 points)\\
+    Many languages provide iterators or generators for producing sequences of values.
+    In Erlang, we can use list comprehensions to process lists of values,
+    and functions such as \listdoc{seq}{2} to generate lists of index values.
+    However, it's annoying that \listdoc{seq}{2} actually constructs the list and may
+    use a large amount of memory, even if we don't need to have the entire list at once.
+    For example,
+    \begin{xcode}
+      \listdoc{sum}{1}(\listdoc{seq}{2}(1, N))
+    \end{xcode}
+    When I try it on my laptop (a 2015 Macbook Pro), I get a run time of about \code{N*36ns}
+    \code{N $\leq$ 10,000,000}, about that twice per value for \code{N = 200,000,000}, and
+    about $11\times$ slower per value when \code{N = 1,000,000,000}.
+    Let's use processes to implement generators!
+
+    Here's the plan.  The generator process will generate the sequence of values and
+    send them to the consumer process.  The generator sends a special atom \code{done}
+    to indicate that all values have been sent.
+    The consumer process will receive each value, process it, and continue.  
+    We want to keep it simple for the user; so, we'll make an example similar to
+    \listdoc{foldl}{3}.
+
+    In more detail, a generator function is of the form \code{GenFun(GenArg)}.
+    If there is another value to send to the consumer,
+    \code{GenFun(GenArg)} returns a tuple of the form \code{\tuple{V, NextArg}}, where \code{V} is
+    the value to be sent to the consumer process, and \code{NextArg} is the argument for the
+    next call to \code{GenFun}.
+    Otherwise, the sequence is exhausted, and \code{GenFun(GenArg)} returns the atom \code{done}.
+
+    The consumer function is of the form \code{AccFun(Value, Acc) -> NewAcc}.
+    Given the next value in the sequence, \code{Value}, and the current accumulator value, \code{Acc},
+    \code{AccFun(Value, Acc)} computes the next accumulator value.  When all values from the generator
+    have been consumed, our generator based fold will return the final value of \code{Acc}.
+
+    In the template file, \erltemplate{},
+    I provide an example of using a generator with the function \code{gen\_test(N)}.
+    This function computes the sum of the first \code{N} integers.
+    The generator function is 
+    \begin{xcode}
+      fun\=(I) when I =< N -> \tuple{I, I+1};  \xcomment{\{V, NextArg\}}\\
+	 \>(I) -> done; \xcomment{sequence exhausted}
+      end
+    \end{xcode}
+    The generator is given an initial value for \code{I} of \code{1}.
+    The consumer function, is
+    \begin{xcode}
+      fun(V, Acc) -> V + Acc end  \xcomment{that was simple}
+    \end{xcode}
+    The consumer is given an intial value of \code{0} for \code{Acc}.
+    The complete code for \code{gen\_test} is
+    \begin{xcode}
+      ge\=n\_test(N) when is\_integer(N) ->\\
+	\>gen\_fold(\=fun(V, Acc) -> V + Acc end, 0, \xcomment{the consumer, and its initializer}\\
+	\>	    \>fun\=(I) when I =< N -> \tuple{I, I+1};  \xcomment{the generator\ldots}\\
+	\>          \>   \>(I) -> done;\\
+	\>          \>end, 1). \xcomment{\ldots and its initializer}
+    \end{xcode}
+
+    Your task, of course, it to write the function
+    \begin{xcode}
+      gen\_fold(ConsumerFun, ConsumerInit, GeneratorFun, GeneratorInit)
+    \end{xcode}
+    In the hopes of promoting learning rather than frustration with this assignment,
+    I've sketched an implementation in the template code for \erltemplate{}.
+    The function \code{gen\_fold(ConsumerFun, ConsumerInit, GeneratorFun, GeneratorInit)}
+    spawns a generator process, \code{GenProc}, and calls
+    \begin{xcode}
+      gen\_fold(Fun, Acc, GenProc)
+    \end{xcode}
+    The function \code{gen\_fold/3} is a tail recursive function that sends \code{next} requests
+    to \code{GenProc}.  It \code{GenProc} replies with \code{\tuple{gen, GenProc, done}},
+    then \code{gen\_fold/3} returns the last value from \code{Fun}, i.e.\ \code{Acc}.
+    and \code{gen\_fold/3} uses \code{Fun} to combine \code{V} with the current value of \code{Acc}
+    to get the new \code{Acc} and continues.
+
+    Finally,
+    \begin{xcode}
+      gen\_produce(GenFun, GenArg)
+    \end{xcode}
+    handles interprocess communication for the producer.
+    It waits to receive a message of the form \code{\tuple{next, ConsumerPid}} and then calls
+    \code{GenFun} to get a new value or \code{done}.
+
+    Let's turn all of these function descriptions into a problem statement:
+    \begin{enumerate}
+      \item (25 points) Implement (or complete the implementations) of the functions:
+	\begin{enumerate}
+	  \item \code{gen\_produce/2}  (10 points)
+	  \item \code{gen\_fold/3}  (10 points)
+	  \item \code{gen\_fold/4}  (5 points)
+	\end{enumerate}
+      \item (5 points) Are your functions \code{gen\_fold/3} and \code{gen\_produce/2} tail-recursive?
+	Why is it a \emph{very} good idea to write tail-recursive implementations of these functions?
+	\textbf{Hint:} think about what happens if the user provided generator produces a \emph{huge} number of
+	values.
+	\textbf{Note:} For full credit, your implementations of \code{gen\_fold/3} and \code{gen\_produce/2}
+	must be tail-recursive.  I'll take off even more points if you claim that they are tail recursive but they aren't.
+      \item \textbf{Just for fun:}  When I tested my implementation, I had a few surprises.
+	First, \code{gen\_test(N)} was about $400\times$ slower than
+	\begin{xcode}
+	  \listdoc{sum}{1}(\listdoc{seq}{2}(1, N))
+	\end{xcode}
+	Erlang messages are supposed to be fast -- what happened?!
+	The issue appears to be with the lambda expression \code{fun(V, Acc) -> V + Acc end} and
+	\code{fun(I) -> \textrm{\ldots} end}.  In particular,
+	\begin{xcode}
+	  \listdoc{foldl}{3}(fun(V, Acc) V + Acc end, 0, lists:seq(1, N)
+	\end{xcode}
+	is about 50\% \emph{slower} than the \code{test\_gen} version.
+	Why?  I'm don't know.  If you want to experiment with it, have fun.
+	The Erlang installation on the CS department machines is release OTP/22.
+	Later releases may have fixed this.  I plan to install OTP/25 on my laptop and give it a try.
+	If lambdas are still slow, I'll send a report to the Erlang developers.
+    \end{enumerate}
+\end{enumerate}
+
+
+\section*{Why?}
+\begin{enumerate}
+  \item \textbf{Maps, Folds, and List Comprehensions:}  These are intended to be easy problems
+    to let you check to make sure that you're comfortable with the Erlang features that we'll
+    use throughout the first half of the class.
+  \item \textbf{GCD:}  Another simple example, but one where you need to think a bit about the logic of the function.
+    If you haven't done programmed in a functional language before, this is a simple ``hello world'' to
+    write a recursive function.  I assume that everyone has seen (or can look up)
+    \hrefc{https://en.wikipedia.org/wiki/Euclidean_algorithm}{Euclid's GCD algorithm}.
+    Yeah, I just cited wikipedia rather than the original Greek -- deal with it.
+  \item \textbf{$\mathbf{\pi}$:}  A fun (maybe that depends on your sense of fun) example from number theory.
+    The problem is embarrassingly parallel, and a great candidate for the ``reduce'' algorithm that we saw
+    with count 3's.  You can look forward to a parallel $\pi$ problem on HW2.
+  \item \textbf{Generators:} Erlang is functional programming plus message passing.  We're using it here
+    because it lets us get into the message passing paradigm quickly and fairly easily.  Given that, you
+    need to see Erlang processes and messages.  This problem does that.
+    As described in \lyse{}, the typical Erlang program makes extensive use of processes and message,
+    and it hides most of the details behind functions that provide a nice abstraction for the problem
+    you want to solve.  This problem gives an illustration of that for 
+\end{enumerate}
+
+\section*{The Library, Errors, Guards, and other good stuff}
+\textbf{The CPSC 521 Erlang Library}: your code \emph{must} run on the CS department linux machines.
+
+This assignment doesn't explicitly use the course library, but some functions like those in the
+\code{\hrefc{https://www.ugrad.cs.ubc.ca/~cs418/resources/erl/doc/time_it.html}{time\_it}} module may
+be helpful.
+To access this library from the CS department machines, give the following command in the Erlang shell:
+\begin{xcode}
+  \eprompt{} \addpath{}("/ubc/cs/home/m/mrg/public\_html/cs521/erl").
+\end{xcode}
+You can also set the path from the command line when you start Erlang.  I've
+included the following in my \texttt{.bashrc} so that I don't have to set the
+code path manually each time I start Erlang:
+\begin{xcode}
+  function erl \{\\
+  \>/usr/local/bin/erl erl -eval '\addpath{}("/ubc/cs/home/m/mrg/public\_html/erl")' "\$@"\\
+  \}  
+\end{xcode}
+See \urlc{http://erlang.org/doc/man/erl.html} for a more detailed description of
+the \texttt{erl} command and the options it takes.
+
+If you are running Erlang on your own computer, you can get a copy of the course library from\\
+\rule{1.5em}{0ex}\urlc{http://www.ugrad.cs.ubc.ca/~cs418/resources/erl/erl.tgz}\\
+Unpack it in a directory of your choice, and use \code{\addpath{}} as described above
+to use it.  Changes may be made to the library to add features or fix bugs as the term progresses.
+I try to minimize the disruption and will announce any such changes.
+
+\textbf{Compiler Errors}: if your code doesn't compile, it is likely that you
+will get a zero on all coding questions.
+Please do not submit code that does not compile successfully.
+After grading all assignments that compile successfully,
+we \emph{might} look at some of the ones that don't.
+This is entirely up to the discretion of the instructor.
+If you have half-written code that doesn't compile, please comment
+it out or delete it.
+
+\textbf{Compiler Warnings}: your code should compile without warnings.
+In my experience, most of the Erlang compiler warnings point to real problems.
+For example, if the compiler complains about an unused variable, that often
+means I made a typo later in the function and referred to the wrong variable,
+and ended up not using the one I wanted.  Of course, the ``base case'' in recursive
+function often has unused parameters -- use a \code{\_} to mark these as unused.
+Other warnings such as functions that are defined but not used, the wrong number
+of arguments to an
+\code{\hrefc{http://erlang.org/doc/man/io.html\#format-2}{io:format}}
+call, etc., generally point to real mistakes
+in the code.  We will take off points for compiler warnings.
+
+\textbf{Printing to stdout}: please don't unless we specifically ask you to.
+If you include a \emph{short} error message when throwing an error, that's
+fine, but not required.  If you print \emph{anything} for a case with normal
+execution when no printing was specified, we will take off points.
+
+\textbf{Guards}: in general, guards are a good idea.
+If you use guards, then your code will tend to fail close to the actual error, and
+that makes debugging easier.
+Guards also make your intentions and assumptions part of the code.
+Documenting your assumptions in this way makes it much easier if someone else needs
+to work with your code, or if you need to work with your code a few months or a few
+years after you originally wrote it.
+There are some cases where adding guards would cause the code to run much slower.
+In those cases, it can be reasonable to use comments instead of guards.
+Here are a few rules for adding guards:
+\begin{itemize}
+  \item If you need the guard to write easy-to-read patterns, use the guard.
+    For example, to have separate cases for \code{N > 0} and \code{N < 0}.
+  \item If adding the guard makes your code easier to read (and doesn't have a
+    significant run-time penalty), use the guard.
+  \item If a function is an ``entry point'' into your code (e.g.\ an exported function)
+    it's good to have your assumptions about arguments clearly stated.  Ideally, you
+    this with guards, that is great.  
+    \begin{itemize}
+      \item Often, a function can only be implemented for \emph{some} values of its arguments.
+	For example, we might have:
+	\begin{SmallCode}
+	  sendSquare(Pid, N) -> Pid ! N*N.
+	\end{SmallCode}
+	A call such as \code{SendSquare([1, 2, 3], cow)} doesn't make sense.
+	Bad calls should throw an error (e.g.\ a \code{badarg} error).
+	Please, don't silently ignore bad arguments, for example
+	\begin{SmallCode}
+	  sendSquare(Pid, N) ->\\
+	  \> if \=is\_pid(Pid) and is\_number(N) -> Pid ! {square, N*N};
+	  \>    \>true -> "messed up actual arguments"
+	  \> end\\
+	  end.
+	\end{SmallCode}
+	The caller might very well ignore the return value of \code{SendSquare}, and
+	\code{Pid} might end up blocking, waiting for a message that will never arrive.
+	Furthermore, putting tests to see if the return value is an error code is so C,
+	but throwing explicit exceptions and writing error handlers (if you want to do
+	something other than killing the process that threw the error) is so much easier
+	to write, read, and maintain.
+	\par
+	We will test your code on bad arguments and make sure that an error gets thrown.
+    \end{itemize}
+  \item Adding lots of little guards to every helper function can clutter your code.
+    Write the code that you would want others to write if you are going to read it.
+  \item In some cases, guards can cause a severe performance penalty.
+    In that case, it's better to use a wrapper function so you can test the guards once
+    and then go on from there. Or you can use comments; comments don't slow down the code.
+    Any exported function should throw an error when called with bad arguments.
+\end{itemize}
+
+
+A common case for omitting guards occurs with tail-recursive functions.
+We often write a wrapper function that initializes the ``accumulator'' and
+then calls the tail-recursive code.
+We export the wrapper, but the tail-recursive part is not exported because
+the user doesn't need to know the details of the tail-recursive implementation.
+In this case, it makes sense to declare the guards for the wrapper function.
+If those guarantee the guards for the tail-recursive code, and the tail
+recursive code can only be called from inside its module, then we can omit
+the guards for the tail-recursive version.  This way, the guards get checked
+once, but hold for all of the recursive calls.  Doing this gives us the
+robustness of guard checking \textbf{and} the speed of tail recursion.\medskip
+
+\vfill
+\parbox{0.16\textwidth}{
+  \includegraphics[width=0.16\textwidth]{cc-by}
+}\hfill\parbox{0.80\textwidth}{
+  \footnotesize
+  Unless otherwise noted or cited, 
+  the questions and other material in this homework problem set
+  is copyright 2023 by Mark Greenstreet
+  and are made available under the terms of the Creative Commons
+  Attribution 4.0 International license
+  \url{http://creativecommons.org/licenses/by/4.0/}
+}
+\end{document}
